@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>io.insightdashboard</groupId>
+  <artifactId>jmeter-insightdashboard</artifactId>
+  <version>1.0.0</version>
+  <packaging>jar</packaging>
+
+  <name>Insight Dashboard for JMeter</name>
+  <description>A real-time, collapsible per-transaction results dashboard
+    for Apache JMeter, with a structured report and optional AI-assisted
+    analysis and chat.</description>
+
+  <properties>
+    <maven.compiler.source>11</maven.compiler.source>
+    <maven.compiler.target>11</maven.compiler.target>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <!-- Match this to the JMeter version you are deploying into -->
+    <jmeter.version>5.6.3</jmeter.version>
+  </properties>
+
+  <dependencies>
+    <!-- Core JMeter classes: SampleResult, TestElement, SampleListener, etc. -->
+    <dependency>
+      <groupId>org.apache.jmeter</groupId>
+      <artifactId>ApacheJMeter_core</artifactId>
+      <version>${jmeter.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <!-- GUI base classes: AbstractListenerGui, VerticalPanel, etc. -->
+    <dependency>
+      <groupId>org.apache.jmeter</groupId>
+      <artifactId>ApacheJMeter_components</artifactId>
+      <version>${jmeter.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <!-- For the Remote Run tab's SSH connectivity. Deliberately the
+         com.github.mwiede fork, NOT the original com.jcraft:jsch: the
+         original was last released in 2018 and is actively broken against
+         modern setups - it can't read the OpenSSH-v1 key format ssh-keygen
+         has emitted by default since OpenSSH 7.8, and has no rsa-sha2-*
+         support, so RSA key auth fails outright against OpenSSH 8.8+
+         (confirmed, not assumed, before choosing this). This fork keeps the
+         same com.jcraft.jsch package/API, so it's a drop-in replacement -
+         real scope (not provided), since JMeter's own runtime has no SSH
+         library to provide this from; it must be bundled into this jar
+         (see the shade plugin below). -->
+    <dependency>
+      <groupId>com.github.mwiede</groupId>
+      <artifactId>jsch</artifactId>
+      <version>2.28.0</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <finalName>jmeter-insightdashboard</finalName>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.11.0</version>
+      </plugin>
+      <plugin>
+        <!-- Populates Implementation-Version in the jar's manifest from this
+             pom's own <version> above, so the in-app footer can read the
+             version at runtime (getClass().getPackage().getImplementationVersion())
+             without it drifting out of sync with a hardcoded string. -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>3.4.1</version>
+        <configuration>
+          <archive>
+            <manifest>
+              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+      <plugin>
+        <!-- Bundles JSch's classes directly into this jar, since JMeter's
+             own runtime has no SSH library to provide it - without this,
+             the Remote Run tab would throw NoClassDefFoundError the moment
+             it's used, even though this project compiles fine (JSch would
+             only be present at compile time via Maven, not at runtime
+             inside JMeter's own classloader). Deliberately NOT relocating
+             the com.jcraft.jsch package - see the dependency comment above
+             and the pom comment here for why: JSch is a Multi-Release JAR,
+             and a recent, unresolved shade-plugin bug mishandles relocation
+             of those (rewrites a class's bytecode references but not its
+             actual META-INF/versions/N/ file path, breaking lookup) in a
+             way that can't be verified without actually running the build,
+             which isn't possible here. Bundling as-is avoids that risk. -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.6.0</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <createDependencyReducedPom>false</createDependencyReducedPom>
+              <filters>
+                <filter>
+                  <!-- Drop signature files from the bundled dependency -
+                      a shaded jar with a mismatched/partial signature can
+                      fail to load at all, a well-known shade-plugin gotcha
+                      independent of the Multi-Release issue above. -->
+                  <artifact>*:*</artifact>
+                  <excludes>
+                    <exclude>META-INF/*.SF</exclude>
+                    <exclude>META-INF/*.DSA</exclude>
+                    <exclude>META-INF/*.RSA</exclude>
+                  </excludes>
+                </filter>
+              </filters>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>
