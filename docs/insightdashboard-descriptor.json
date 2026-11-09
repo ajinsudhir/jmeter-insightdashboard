@@ -1,21 +1,21 @@
 [
-    {
-        "id": "jmeter-insightdashboard",
-        "name": "Insight Dashboard for JMeter",
-        "description": "A real-time, collapsible per-transaction results listener for JMeter: live stat cards, response-time charts, a tree table (expand a transaction to see its individual requests, SLA threshold highlighting, throughput/P90/P95/P99), CSV/Excel export, a structured, numbered performance report (test overview, slowest transactions/requests, failures, error codes, SLA compliance) that populates automatically as soon as a test finishes, and an AI-assisted Observations section, Chat tab, and failure explanations (via a local Gemini CLI or Claude Code install) \u2014 all computed directly from the test data, with the AI layer entirely optional.",
-        "screenshotUrl": "https://github.com/ajinsudhir/jmeter-insightdashboard/raw/main/docs/screenshot.png",
-        "helpUrl": "https://github.com/ajinsudhir/jmeter-insightdashboard",
-        "vendor": "Ajin Sudhir",
-        "markerClass": "io.insightdashboard.jmeter.CustomDashboardVisualizer",
-        "componentClasses": [
-            "io.insightdashboard.jmeter.CustomDashboardVisualizer"
-        ],
-        "canUninstall": true,
-        "versions": {
-            "1.0.0": {
-                "changes": "Initial public release.",
-                "downloadUrl": "https://github.com/ajinsudhir/jmeter-insightdashboard/releases/download/v1.0.0/jmeter-insightdashboard.jar"
-            }
-        }
+  {
+    "id": "jmeter-insightdashboard",
+    "name": "Insight Dashboard for JMeter",
+    "description": "A real-time, collapsible per-transaction results listener for JMeter: live stat cards, response-time charts, a tree table (expand a transaction to see its individual requests, SLA threshold highlighting, throughput/P90/P95/P99), CSV/Excel export, a structured, numbered performance report (test overview, slowest transactions/requests, failures, error codes, SLA compliance) that populates automatically as soon as a test finishes, and an AI-assisted Observations section, Chat tab, and failure explanations (via a local Gemini CLI or Claude Code install) — all computed directly from the test data, with the AI layer entirely optional.",
+    "screenshotUrl": "https://github.com/ajinsudhir/jmeter-insightdashboard/raw/main/docs/screenshot.png",
+    "helpUrl": "https://github.com/ajinsudhir/jmeter-insightdashboard",
+    "vendor": "Ajin Sudhir",
+    "markerClass": "io.insightdashboard.jmeter.CustomDashboardVisualizer",
+    "componentClasses": [
+      "io.insightdashboard.jmeter.CustomDashboardVisualizer"
+    ],
+    "canUninstall": true,
+    "versions": {
+      "1.0.0": {
+        "changes": "Initial public release.",
+        "downloadUrl": "https://github.com/ajinsudhir/jmeter-insightdashboard/releases/download/v1.0.0/jmeter-insightdashboard-1.0.0.jar"
+      }
     }
+  }
 ]
